@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useContext } from "react";
 import { MoreHorizontal, UserPlus, Edit2 } from "react-feather";
 import CardAdd from "./CardAdd";
@@ -5,6 +6,7 @@ import { BoardContext } from "../context/BoardContext";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import AddList from "./AddList";
 import Utils from "../utils/Utils";
+import CardManager from "./CardManager";
 
 const Main = () => {
   const { allboard, setAllBoard } = useContext(BoardContext);
@@ -98,7 +100,7 @@ const Main = () => {
                                     draggableId={item.id}
                                     index={index}
                                   >
-                                    {(provided) => (
+                                    {(provided, snapshot) => (
                                       <div
                                         ref={provided.innerRef}
                                         {...provided.draggableProps}
