@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { ChevronRight, ChevronLeft, Plus, X } from "react-feather";
 import { Popover } from "react-tiny-popover";
 import { BoardContext } from "../context/BoardContext";
@@ -19,12 +19,32 @@ const Sidebar = () => {
     setAllBoard(newBoard);
   };
   const addBoard = () => {
-    let newB = { ...allboard };
-    newB.boards.push(boardData);
-    setAllBoard(newB);
+    const updatedBoards = {
+      ...allboard,
+      boards: [...allboard.boards, boardData],
+    };
+    setAllBoard(updatedBoards);
     setBoarddata(blankBoard);
-    setShowpop(!showpop);
+    setShowpop(false); // close popover
   };
+  useEffect(() => {
+    console.log("All boards from context:", allboard);
+  }, [allboard]);
+
+  const deleteBoard = (index) => {
+    let newBoards = { ...allboard };
+    newBoards.boards.splice(index, 1); // Remove the board at the given index
+
+    // Adjust active board if needed
+    if (newBoards.active === index) {
+      newBoards.active = null;
+    } else if (newBoards.active > index) {
+      newBoards.active -= 1;
+    }
+
+    setAllBoard(newBoards);
+  };
+
   return (
     <div
       className={`bg-[#121417] h-[calc(100vh-3rem)] border-r border-r-[#9fadbc29] transition-all linear duration-500 flex-shrink-0 ${
@@ -115,24 +135,35 @@ const Sidebar = () => {
           </div>
           <ul>
             {allboard.boards &&
-              allboard.boards.map((x, i) => {
-                return (
-                  <li key={i}>
-                    <button
-                      onClick={() => setActiveboard(i)}
-                      className="px-3 py-2 w-full text-sm flex justify-start align-baseline hover:bg-gray-500"
+              allboard.boards.map((x, i) => (
+                <li
+                  key={i}
+                  className="flex justify-between items-center px-3 py-2 hover:bg-gray-500"
+                >
+                  {/* Board button with color and title */}
+                  <button
+                    onClick={() => setActiveboard(i)}
+                    className="flex items-center text-sm text-left w-full"
+                  >
+                    <span
+                      className="w-4 h-4 rounded-sm mr-2"
+                      style={{ backgroundColor: `${x.bgcolor}` }}
                     >
-                      <span
-                        className="w-6 h-max rounded-sm mr-2"
-                        style={{ backgroundColor: `${x.bgcolor}` }}
-                      >
-                        &nbsp;
-                      </span>
-                      <span>{x.name}</span>
-                    </button>
-                  </li>
-                );
-              })}
+                      &nbsp;
+                    </span>
+                    <span className="truncate">{x.name}</span>
+                  </button>
+
+                  {/* Delete button beside title */}
+                  <button
+                    onClick={() => deleteBoard(i)}
+                    className="text-gray-400 hover:text-red-500 ml-2"
+                    title="Delete Board"
+                  >
+                    <X size={14} />
+                  </button>
+                </li>
+              ))}
           </ul>
         </div>
       )}
